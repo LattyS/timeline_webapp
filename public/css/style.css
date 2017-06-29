@@ -1,0 +1,13 @@
+.post-content {
+    display: inline-block;
+}
+
+article {
+    position: relative;
+}
+
+.delete-button {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
