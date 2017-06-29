@@ -10,16 +10,21 @@
 
 <h1>Timeline App</h1>
 
+<!-- Formulaire de connexion -->
 <div ng-show="timeline.isDisconnected">
     <h3>Veuillez vous identifier pour accèder à la timeline</h3>
     <form class="form-inline" name="loginForm" ng-submit="timeline.loginUser()">
-        <input type="text" class="form-control" placeholder="Votre pseudo ..." required ng-model="timeline.pseudo">
-        <input type="submit" class="btn btn-primary" value="Se connecter">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Votre pseudo ..." required ng-model="timeline.pseudo">
+            <span class="input-group-btn">
+                <input type="submit" class="btn btn-primary" value="Se connecter">
+            </span>
+        </div>
     </form>
 </div>
 
-
 <main>
+    <!-- Formulaire de publication -->
     <div class="well" ng-hide="timeline.isDisconnected">
         <h3>Ajouter une publication</h3>
         <form name="messageForm" ng-submit="timeline.sendPost()">
@@ -33,98 +38,28 @@
         </form>
     </div>
 
-    <div>
-        <h3>Publications</h3>
-        <div ng-repeat="post in timeline.posts | limitTo : 10 : $last - 10 | orderBy: 'date':true">
-            <article>
-                <img src="http://lorempixel.com/200/150/" class="img-thumbnail" alt="Post image">
-                <div class="post-content">
-                    <p><strong>Par {{post.pseudo}}</strong></p>
-                    <p>{{post.date | date :  "dd.MM.y" }}</p>
-                    <p>{{post.text}}</p>
-                </div>
-                <button type="button" class="btn btn-danger delete-button" ng-click="timeline.deletePost(item)">Supprimer
-                </button>
-            </article>
-            <hr>
-        </div>
+    <!-- Affichage des posts -->
+    <h3>Publications</h3>
+    <div ng-hide="timeline.posts.length">Aucune publications</div>
+    <div ng-repeat="post in timeline.posts | limitTo : 10 : $last - 10 | orderBy: 'date':true">
+        <article>
+            <img src="http://lorempixel.com/200/150/" class="img-thumbnail" alt="Post image">
+            <div class="post-content">
+                <p><strong>Par {{post.pseudo}}</strong></p>
+                <p>{{post.date | date : "dd.MM.y" }}</p>
+                <p>{{post.text}}</p>
+            </div>
+            <button type="button" class="btn btn-danger delete-button" ng-click="timeline.deletePost(item)">
+                Supprimer
+            </button>
+        </article>
+        <hr>
     </div>
 </main>
-<!--
-    <aside class="col-md-3">
-        <h4>Membres connectés</h4>
-        <ul>
-            <li ng-repeat="user in timeline.users">{{user.pseudo}} <span ng-show="user.id === timeline.socket.id">(vous)</span></li>
-        </ul>
-    </aside>
-    -->
-
 
 <script src="/node_modules/angular/angular.js"></script>
 <script src="/socket.io/socket.io.js"></script>
-<script>
-    angular
-        .module('timelineApp', [])
-        .controller('TimelineController', function ($scope) {
-            var timeline = this;
-
-            timeline.isDisconnected = true;
-
-            timeline.users = [];
-            timeline.posts = [];
-
-            timeline.pseudo = '';
-            timeline.postText = '';
-            timeline.postDate = new Date();
-
-            // Lorsque l'utilisateur se connecte
-            timeline.loginUser = function () {
-
-                timeline.isDisconnected = false;
-
-                // Création et stockage du socket dans 'this', ce qui permet de l'utiliser dans la vue HTML
-                timeline.socket = io('ws://localhost:3000');
-
-                // Envoi au serveur du pseudo (sous forme de texte)
-                timeline.socket.emit('setPseudo', timeline.pseudo);
-
-                // 4) Le serveur nous dit qu'un utilisateur à posté un nouveau message
-                timeline.socket.on('newpost', function (post) {
-                    timeline.posts.push(post); // On rajoute ce message (qui est un objet) à notre propre liste
-                    $scope.$apply(); // Force les changements au niveau de la vue
-                });
-            };
-
-            // Envoi des nouveaux messages dans le tchat
-            timeline.sendPost = function () {
-                if (timeline.postText.trim() === '') return; // Filtre les messages vides
-
-                // On informe le serveur qu'on veut poster ce message
-                timeline.socket.emit('newpost', timeline.messageText); // on lui envoie une String
-
-                // Puis, on rajoute notre propre message dans notre liste (pour qu'il s'affiche chez nous quand même :))
-                timeline.posts.push({
-                    pseudo: timeline.pseudo,
-                    text: timeline.postText,
-                    date: timeline.postDate
-                });
-
-                timeline.postText = ''; // Réinitialise le champs message
-            };
-
-            timeline.deletePost = function (item) {
-
-                if (item.pseudo == currentUser) {
-                    $scope.timeline.posts.splice($scope.timeline.posts.indexOf(item),1);
-                } else {
-                    console.log("Vous n'êtes pas l'auteur de ce post")
-                }
-
-            };
-
-        });
-
-</script>
+<script src="js/script.js"></script>
 
 </body>
 </html>
