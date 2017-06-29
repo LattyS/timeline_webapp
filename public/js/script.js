@@ -20,7 +20,7 @@ angular
             // Création et stockage du socket dans 'this', ce qui permet de l'utiliser dans la vue HTML
             timeline.socket = io('ws://localhost:3000');
 
-            // Envoi au serveur du pseudo (sous forme de texte)
+            // Envoi au serveur
             timeline.socket.emit('setPseudo', timeline.pseudo);
 
             // 4) Le serveur nous dit qu'un utilisateur a posté un article
@@ -30,29 +30,24 @@ angular
             });
         };
 
-        // Envoi des nouveaux messages dans le tchat
+        // Envoi des posts
         timeline.sendPost = function () {
             if (timeline.postText.trim() === '') return; // Filtre les posts sans texte
 
-            timeline.socket.emit('newpost', timeline.messageText);
-
-            timeline.posts.push({
+            var postContent = {
                 pseudo: timeline.pseudo,
                 text: timeline.postText,
                 date: timeline.postDate
-            });
+            };
 
+            timeline.socket.emit('newpost', postContent);
+            timeline.posts.push(postContent);
             timeline.postText = '';
         };
 
+        //Suppression d'un post
         timeline.deletePost = function (item) {
-
-            if (item.pseudo == currentUser) {
-                $scope.timeline.posts.splice($scope.timeline.posts.indexOf(item), 1);
-            } else {
-                console.log("Vous n'êtes pas l'auteur de ce post")
-            }
-
-        };
+            timeline.posts.splice(timeline.posts.indexOf(item), 1);
+        }
 
     });

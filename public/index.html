@@ -41,7 +41,7 @@
     <!-- Affichage des posts -->
     <h3>Publications</h3>
     <div ng-hide="timeline.posts.length">Aucune publications</div>
-    <div ng-repeat="post in timeline.posts | limitTo : 10 : $last - 10 | orderBy: 'date':true">
+    <div ng-repeat="post in timeline.posts | orderBy: 'date':true">
         <article>
             <img src="http://lorempixel.com/200/150/" class="img-thumbnail" alt="Post image">
             <div class="post-content">
@@ -49,7 +49,7 @@
                 <p>{{post.date | date : "dd.MM.y" }}</p>
                 <p>{{post.text}}</p>
             </div>
-            <button type="button" class="btn btn-danger delete-button" ng-click="timeline.deletePost(item)">
+            <button type="button" class="btn btn-danger delete-button" ng-if="post.pseudo == timeline.pseudo" ng-click="timeline.deletePost(item)">
                 Supprimer
             </button>
         </article>
