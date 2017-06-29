@@ -37,12 +37,12 @@ io.on('connection', socket => {
     });
 
 
-    socket.on('newpost', (postText, postDate) => {
+    socket.on('newpost', (post) => {
         newPost.pseudo = currentUser.pseudo;
-        newPost.text = postText;
-        newPost.date = postDate;
+        newPost.text = post;
+        newPost.date = post;
         postsList.push(newPost);
-        socket.emit('newpost', newPost);
+        socket.broadcast.emit('newpost', newPost);
 
     });
 
